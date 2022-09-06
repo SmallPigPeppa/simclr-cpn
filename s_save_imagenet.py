@@ -56,8 +56,8 @@ if __name__ == '__main__':
     )
     train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
     test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
-    train_dataset = train_dataset.map(map_func)
-    test_dataset = test_dataset.map(map_func)
+    train_dataset = train_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x,dtype=tf.float32), y))
+    test_dataset = test_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x,dtype=tf.float32), y))
 
 
     x_train = np.empty((0, 2048))
