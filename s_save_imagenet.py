@@ -94,12 +94,12 @@ def center_crop(image, height, width, crop_proportion):
     return image
 
 
-def map_func(img, label):
-    img = tf.image.convert_image_dtype(img, dtype=tf.float32)
-    img = center_crop(img, IMG_SIZE, IMG_SIZE, crop_proportion=CROP_PROPORTION)
-    img = tf.reshape(img, [IMG_SIZE, IMG_SIZE, 3])
-    img = tf.clip_by_value(img, 0., 1.)
-    return img, label
+# def map_func(img, label):
+#     img = tf.image.convert_image_dtype(img, dtype=tf.float32)
+#     img = center_crop(img, IMG_SIZE, IMG_SIZE, crop_proportion=CROP_PROPORTION)
+#     img = tf.reshape(img, [IMG_SIZE, IMG_SIZE, 3])
+#     img = tf.clip_by_value(img, 0., 1.)
+#     return img, label
 def map_func(img, label):
     # img = tf.image.convert_image_dtype(img, dtype=tf.float32)
     # img = center_crop(img, IMG_SIZE, IMG_SIZE, crop_proportion=CROP_PROPORTION)
