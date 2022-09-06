@@ -118,7 +118,7 @@ def map_func(img, label):
 
 if __name__ == '__main__':
     # encoder
-    ckpt_path = "/share/lwz/simclr_model/r50_imagenet/saved_model/2"
+    ckpt_path = "/share/lwz/simclr_model/r50_google/saved_model"
     data_path = "/share/datasets/torch_ds/imagenet-subset"
     dataset = "imagenet-subset"
     batch_size = 512
