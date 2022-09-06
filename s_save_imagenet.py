@@ -24,98 +24,6 @@ LABELS100 = [233, 236, 246, 249, 258, 272, 280, 284, 286, 303, 305, 307, 309, 31
 LABELS100_TF = tf.convert_to_tensor(LABELS100, dtype=tf.int64)
 
 
-def _compute_crop_shape(
-        image_height, image_width, aspect_ratio, crop_proportion):
-    """Compute aspect ratio-preserving shape for central crop.
-
-    The resulting shape retains `crop_proportion` along one side and a proportion
-    less than or equal to `crop_proportion` along the other side.
-
-    Args:
-      image_height: Height of image to be cropped.
-      image_width: Width of image to be cropped.
-      aspect_ratio: Desired aspect ratio (width / height) of output.
-      crop_proportion: Proportion of image to retain along the less-cropped side.
-
-    Returns:
-      crop_height: Height of image after cropping.
-      crop_width: Width of image after cropping.
-    """
-    image_width_float = tf.cast(image_width, tf.float32)
-    image_height_float = tf.cast(image_height, tf.float32)
-
-    def _requested_aspect_ratio_wider_than_image():
-        crop_height = tf.cast(
-            tf.math.rint(crop_proportion / aspect_ratio * image_width_float),
-            tf.int32)
-        crop_width = tf.cast(
-            tf.math.rint(crop_proportion * image_width_float), tf.int32)
-        return crop_height, crop_width
-
-    def _image_wider_than_requested_aspect_ratio():
-        crop_height = tf.cast(
-            tf.math.rint(crop_proportion * image_height_float), tf.int32)
-        crop_width = tf.cast(
-            tf.math.rint(crop_proportion * aspect_ratio * image_height_float),
-            tf.int32)
-        return crop_height, crop_width
-
-    return tf.cond(
-        aspect_ratio > image_width_float / image_height_float,
-        _requested_aspect_ratio_wider_than_image,
-        _image_wider_than_requested_aspect_ratio)
-
-
-def center_crop(image, height, width, crop_proportion):
-    """Crops to center of image and rescales to desired size.
-
-    Args:
-      image: Image Tensor to crop.
-      height: Height of image to be cropped.
-      width: Width of image to be cropped.
-      crop_proportion: Proportion of image to retain along the less-cropped side.
-
-    Returns:
-      A `height` x `width` x channels Tensor holding a central crop of `image`.
-    """
-    shape = tf.shape(image)
-    image_height = shape[0]
-    image_width = shape[1]
-    crop_height, crop_width = _compute_crop_shape(
-        image_height, image_width, height / width, crop_proportion)
-    offset_height = ((image_height - crop_height) + 1) // 2
-    offset_width = ((image_width - crop_width) + 1) // 2
-    image = tf.image.crop_to_bounding_box(
-        image, offset_height, offset_width, crop_height, crop_width)
-
-    image = tf.image.resize([image], [height, width],
-                            method=tf.image.ResizeMethod.BICUBIC)[0]
-
-    return image
-
-
-# def map_func(img, label):
-#     img = tf.image.convert_image_dtype(img, dtype=tf.float32)
-#     img = center_crop(img, IMG_SIZE, IMG_SIZE, crop_proportion=CROP_PROPORTION)
-#     img = tf.reshape(img, [IMG_SIZE, IMG_SIZE, 3])
-#     img = tf.clip_by_value(img, 0., 1.)
-#     return img, label
-def map_func(img, label):
-    img = tf.image.convert_image_dtype(img, dtype=tf.float32)
-    # img = center_crop(img, IMG_SIZE, IMG_SIZE, crop_proportion=CROP_PROPORTION)
-    img = tf.reshape(img, [IMG_SIZE, IMG_SIZE, 3])
-    img = tf.clip_by_value(img, 0., 1.)
-    # return img, label
-    print(img)
-    return img, label
-
-
-# def mapfunc(label):
-#     return np.where(label == np.array(LABELS100))[0]
-
-
-# vmapfunc = np.vectorize(mapfunc)
-
 if __name__ == '__main__':
     # encoder
     ckpt_path = "/share/lwz/simclr_model/r50_google/saved_model"
@@ -138,6 +46,14 @@ if __name__ == '__main__':
     )
     train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+    transforms = tf.keras.layers.CenterCrop(
+        height=IMG_SIZE, width=IMG_SIZE
+    )
+    train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
+    test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
+
+
     x_train = np.empty((0, 2048))
     y_train = np.empty((0))
     for (imgs, labels) in tqdm(train_dataset):
