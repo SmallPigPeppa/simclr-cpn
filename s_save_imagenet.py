@@ -148,20 +148,23 @@ if __name__ == '__main__':
 
     x_train = np.empty((0, 2048))
     y_train = np.empty((0))
-    for (imgs, labels) in tqdm(train_dataset):
+    progbar_train = tf.keras.utils.Progbar(200000/batch_size)
+    for idx,(imgs, labels) in enumerate(train_dataset):
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_train = np.append(x_train, x_i, axis=0)
         # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
         y_train = np.append(y_train, labels.numpy(), axis=0)
+        progbar_train.update(idx)
     print("x_train.shape:", x_train.shape, "\ny_train.shape:", y_train.shape)
 
     x_test = np.empty((0, 2048))
     y_test = np.empty((0))
-    for (imgs, labels) in tqdm(test_dataset):
+    for idx,(imgs, labels) in enumerate(test_dataset):
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_test = np.append(x_test, x_i, axis=0)
         # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
         y_test = np.append(y_test, labels.numpy(), axis=0)
+        progbar_train.update(idx)
     print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
 
     np.save(f'data_pretrained/{dataset}/x_train', x_train)
