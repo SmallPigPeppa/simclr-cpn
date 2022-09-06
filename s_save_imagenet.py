@@ -35,7 +35,7 @@ if __name__ == '__main__':
     dataset = "imagenet-subset"
     batch_size = 512
     image_size = 224
-    lr = 0.0001
+    lr = 0.1
     epochs = 100
     pretrained_model = tf.saved_model.load(ckpt_path)
     train_dataset = tf.keras.utils.image_dataset_from_directory(
