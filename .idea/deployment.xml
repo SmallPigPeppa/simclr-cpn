@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" autoUpload="Always" serverName="wzliu@127.0.0.1:7018" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="wzliu@114.113.235.86:49762">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/wzliu/code/simclr32_3" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="wzliu@127.0.0.1:7018">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/wzliu/code/simclr32_3" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
+  </component>
+</project>
