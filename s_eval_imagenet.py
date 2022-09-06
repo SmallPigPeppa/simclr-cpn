@@ -7,7 +7,7 @@ import numpy as np
 import os
 import tensorflow_datasets as tfds
 import random
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1,2'
 CROP_PROPORTION = 0.875
 # CROP_PROPORTION = 1.
 # CIFAR100_LABEL = [5, 6, 52, 60, 61, 75, 84, 95, 103, 107, 120, 156, 187, 189,
