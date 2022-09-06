@@ -128,28 +128,18 @@ if __name__ == '__main__':
     pretrained_model = tf.saved_model.load(ckpt_path)
     train_dataset = tf.keras.utils.image_dataset_from_directory(
         directory=os.path.join(data_path, "train"),
-        batch_size=32,
+        batch_size=batch_size,
         image_size=(256, 256),
     )
     test_dataset = tf.keras.utils.image_dataset_from_directory(
         directory=os.path.join(data_path, "val"),
-        batch_size=32,
+        batch_size=batch_size,
         image_size=(256, 256),
     )
-    # train_dataset = train_dataset.batch(batch_size)
-    # # train_dataset = train_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    # train_dataset = train_dataset.batch(batch_size)
-    # print(next(iter(train_dataset)))
-    # train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    #
-    # test_dataset = test_dataset.batch(batch_size)
-    # test_dataset = test_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    # test_dataset = test_dataset.batch(batch_size)
-    # test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    #
+    train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     x_train = np.empty((0, 2048))
     y_train = np.empty((0))
-    progbar_train = tf.keras.utils.Progbar(200000/batch_size)
     for (imgs, labels) in tqdm(train_dataset):
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_train = np.append(x_train, x_i, axis=0)
@@ -159,12 +149,11 @@ if __name__ == '__main__':
 
     x_test = np.empty((0, 2048))
     y_test = np.empty((0))
-    for idx,(imgs, labels) in enumerate(test_dataset):
+    for (imgs, labels) in tqdm(test_dataset):
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_test = np.append(x_test, x_i, axis=0)
         # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
         y_test = np.append(y_test, labels.numpy(), axis=0)
-        progbar_train.update(idx)
     print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
 
     np.save(f'data_pretrained/{dataset}/x_train', x_train)
@@ -185,7 +174,9 @@ if __name__ == '__main__':
     train_ds = train_ds.batch(batch_size)
 
     # create linear model and fit
-    linear_model = tf.keras.models.Sequential(tf.keras.layers.Dense(units=100))
+    linear_model = tf.keras.models.Sequential(
+        tf.keras.layers.CenterCrop(height=IMG_SIZE, width=IMG_SIZE),
+        tf.keras.layers.Dense(units=100))
     linear_model.compile(optimizer=tf.keras.optimizers.Adam(lr),
                          loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                          metrics=['accuracy'])
