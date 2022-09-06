@@ -128,12 +128,12 @@ if __name__ == '__main__':
     pretrained_model = tf.saved_model.load(ckpt_path)
     train_dataset = tf.keras.utils.image_dataset_from_directory(
         directory=os.path.join(data_path, "train"),
-        batch_size=32,
+        batch_size=1,
         image_size=(256, 256),
     )
     test_dataset = tf.keras.utils.image_dataset_from_directory(
         directory=os.path.join(data_path, "val"),
-        batch_size=32,
+        batch_size=1,
         image_size=(256, 256),
     )
     train_dataset = train_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
