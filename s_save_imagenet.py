@@ -139,7 +139,7 @@ if __name__ == '__main__':
     train_dataset = train_dataset.batch(batch_size)
     train_dataset = train_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.batch(batch_size)
-    print(train_dataset[0])
+    print(next(train_dataset))
     # train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     #
     # test_dataset = test_dataset.batch(batch_size)
