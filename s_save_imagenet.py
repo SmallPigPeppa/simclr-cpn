@@ -22,7 +22,11 @@ LABELS100 = [233, 236, 246, 249, 258, 272, 280, 284, 286, 303, 305, 307, 309, 31
              943,
              944, 956, 959, 963, 975, 977, 982, 985, 988, 993, 996, 997]
 LABELS100_TF = tf.convert_to_tensor(LABELS100, dtype=tf.int64)
-
+def map_func(img, label):
+    img = tf.image.convert_image_dtype(img, dtype=tf.float32)
+    img = tf.reshape(img, [IMG_SIZE, IMG_SIZE, 3])
+    img = tf.clip_by_value(img, 0., 1.)
+    return img, label
 
 if __name__ == '__main__':
     # encoder
@@ -47,11 +51,13 @@ if __name__ == '__main__':
     train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-    # transforms = tf.keras.layers.CenterCrop(
-    #     height=IMG_SIZE, width=IMG_SIZE
-    # )
-    # train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
-    # test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
+    transforms = tf.keras.layers.CenterCrop(
+        height=IMG_SIZE, width=IMG_SIZE
+    )
+    train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
+    test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
+    train_dataset = train_dataset.map(lambda x, y: (map_func(x), y))
+    test_dataset = test_dataset.map(lambda x, y: (map_func(x), y))
 
 
     x_train = np.empty((0, 2048))
