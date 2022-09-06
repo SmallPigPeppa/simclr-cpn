@@ -176,7 +176,6 @@ if __name__ == '__main__':
 
     # create linear model and fit
     linear_model = tf.keras.models.Sequential(
-        tf.keras.layers.CenterCrop(height=IMG_SIZE, width=IMG_SIZE),
         tf.keras.layers.Dense(units=100))
     linear_model.compile(optimizer=tf.keras.optimizers.Adam(lr),
                          loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
