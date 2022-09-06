@@ -102,16 +102,16 @@ def map_func(img, label):
     return img, label
 
 
-def mapfunc(label):
-    return np.where(label == np.array(LABELS100))[0]
+# def mapfunc(label):
+#     return np.where(label == np.array(LABELS100))[0]
 
 
-vmapfunc = np.vectorize(mapfunc)
+# vmapfunc = np.vectorize(mapfunc)
 
 if __name__ == '__main__':
     # encoder
     ckpt_path = "/share/lwz/simclr_model/r50_imagenet/saved_model/2"
-    data_path = "/share"
+    data_path = "/share/datasets/torch_ds/imagenet-subset"
     dataset = "imagenet-subset"
     batch_size = 512
     image_size = 224
@@ -140,7 +140,8 @@ if __name__ == '__main__':
     for (imgs, labels) in tqdm(train_dataset):
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_train = np.append(x_train, x_i, axis=0)
-        y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
+        # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
+        y_train = np.append(y_train, labels.numpy(), axis=0)
     print("x_train.shape:", x_train.shape, "\ny_train.shape:", y_train.shape)
 
     x_test = np.empty((0, 2048))
@@ -148,7 +149,8 @@ if __name__ == '__main__':
     for (imgs, labels) in tqdm(test_dataset):
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_test = np.append(x_test, x_i, axis=0)
-        y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
+        # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
+        y_test = np.append(y_test, labels.numpy(), axis=0)
     print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
 
     np.save(f'data_pretrained/{dataset}/x_train', x_train)
