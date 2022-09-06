@@ -63,6 +63,7 @@ if __name__ == '__main__':
     x_train = np.empty((0, 2048))
     y_train = np.empty((0))
     for (imgs, labels) in tqdm(train_dataset):
+        print(imgs)
         x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
         x_train = np.append(x_train, x_i, axis=0)
         # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
