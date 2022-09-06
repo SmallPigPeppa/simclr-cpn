@@ -22,11 +22,14 @@ LABELS100 = [233, 236, 246, 249, 258, 272, 280, 284, 286, 303, 305, 307, 309, 31
              943,
              944, 956, 959, 963, 975, 977, 982, 985, 988, 993, 996, 997]
 LABELS100_TF = tf.convert_to_tensor(LABELS100, dtype=tf.int64)
+
+
 def map_func(img, label):
     img = tf.image.convert_image_dtype(img, dtype=tf.float32)
     img = tf.reshape(img, [IMG_SIZE, IMG_SIZE, 3])
     img = tf.clip_by_value(img, 0., 1.)
     return img, label
+
 
 if __name__ == '__main__':
     # encoder
@@ -56,9 +59,10 @@ if __name__ == '__main__':
     )
     train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
     test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
-    train_dataset = train_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x,dtype=tf.float32), y))
-    test_dataset = test_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x,dtype=tf.float32), y))
-
+    train_dataset = train_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x, dtype=tf.float32), y))
+    test_dataset = test_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x, dtype=tf.float32), y))
+    train_dataset = train_dataset.map(lambda x, y: (x / 255., y))
+    test_dataset = test_dataset.map(lambda x, y: (x / 255., y))
 
     x_train = np.empty((0, 2048))
     y_train = np.empty((0))
@@ -79,7 +83,7 @@ if __name__ == '__main__':
         y_test = np.append(y_test, labels.numpy(), axis=0)
     print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
 
-    os.makedirs(f'data_pretrained/{dataset}/',exist_ok=True)
+    os.makedirs(f'data_pretrained/{dataset}/', exist_ok=True)
     np.save(f'data_pretrained/{dataset}/x_train', x_train)
     np.save(f'data_pretrained/{dataset}/x_test', x_test)
     np.save(f'data_pretrained/{dataset}/y_train', y_train)
