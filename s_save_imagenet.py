@@ -47,11 +47,11 @@ if __name__ == '__main__':
     train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
-    transforms = tf.keras.layers.CenterCrop(
-        height=IMG_SIZE, width=IMG_SIZE
-    )
-    train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
-    test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
+    # transforms = tf.keras.layers.CenterCrop(
+    #     height=IMG_SIZE, width=IMG_SIZE
+    # )
+    # train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
+    # test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
 
 
     x_train = np.empty((0, 2048))
