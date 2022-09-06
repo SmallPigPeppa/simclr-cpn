@@ -139,7 +139,7 @@ if __name__ == '__main__':
     # train_dataset = train_dataset.batch(batch_size)
     # # train_dataset = train_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     # train_dataset = train_dataset.batch(batch_size)
-    print(next(iter(train_dataset)))
+    # print(next(iter(train_dataset)))
     # train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     #
     # test_dataset = test_dataset.batch(batch_size)
@@ -147,54 +147,51 @@ if __name__ == '__main__':
     # test_dataset = test_dataset.batch(batch_size)
     # test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
     #
-    # x_train = np.empty((0, 2048))
-    # y_train = np.empty((0))
-    # progbar_train = tf.keras.utils.Progbar(200000/batch_size)
-    # for idx,(imgs, labels) in enumerate(train_dataset):
-    #     print(imgs)
-    #     break
-    #     x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
-    #     x_train = np.append(x_train, x_i, axis=0)
-    #     # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
-    #     y_train = np.append(y_train, labels.numpy(), axis=0)
-    #     progbar_train.update(idx)
-    # print("x_train.shape:", x_train.shape, "\ny_train.shape:", y_train.shape)
-    #
-    # x_test = np.empty((0, 2048))
-    # y_test = np.empty((0))
-    # for idx,(imgs, labels) in enumerate(test_dataset):
-    #     x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
-    #     x_test = np.append(x_test, x_i, axis=0)
-    #     # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
-    #     y_test = np.append(y_test, labels.numpy(), axis=0)
-    #     progbar_train.update(idx)
-    # print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
-    #
-    # np.save(f'data_pretrained/{dataset}/x_train', x_train)
-    # np.save(f'data_pretrained/{dataset}/x_test', x_test)
-    # np.save(f'data_pretrained/{dataset}/y_train', y_train)
-    # np.save(f'data_pretrained/{dataset}/y_test', y_test)
-    #
-    # x_train = np.load(f'data_pretrained/{dataset}/x_train.npy')
-    # x_test = np.load(f'data_pretrained/{dataset}/x_test.npy')
-    # y_train = np.load(f'data_pretrained/{dataset}/y_train.npy')
-    # y_test = np.load(f'data_pretrained/{dataset}/y_test.npy')
-    # print(x_test.shape, y_test.shape)
-    # print(x_train.shape, y_train.shape)
-    #
-    # train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
-    # test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test))
-    # test_ds = test_ds.batch(batch_size)
-    # train_ds = train_ds.batch(batch_size)
-    #
-    # # create linear model and fit
-    # linear_model = tf.keras.models.Sequential(tf.keras.layers.Dense(units=100))
-    # linear_model.compile(optimizer=tf.keras.optimizers.Adam(lr),
-    #                      loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-    #                      metrics=['accuracy'])
-    #
-    # linear_model.fit(
-    #     train_ds,
-    #     epochs=epochs,
-    #     validation_data=test_ds,
-    # )
+    x_train = np.empty((0, 2048))
+    y_train = np.empty((0))
+    progbar_train = tf.keras.utils.Progbar(200000/batch_size)
+    for (imgs, labels) in tqdm(train_dataset):
+        x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
+        x_train = np.append(x_train, x_i, axis=0)
+        # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
+        y_train = np.append(y_train, labels.numpy(), axis=0)
+    print("x_train.shape:", x_train.shape, "\ny_train.shape:", y_train.shape)
+
+    x_test = np.empty((0, 2048))
+    y_test = np.empty((0))
+    for idx,(imgs, labels) in enumerate(test_dataset):
+        x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
+        x_test = np.append(x_test, x_i, axis=0)
+        # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
+        y_test = np.append(y_test, labels.numpy(), axis=0)
+        progbar_train.update(idx)
+    print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
+
+    np.save(f'data_pretrained/{dataset}/x_train', x_train)
+    np.save(f'data_pretrained/{dataset}/x_test', x_test)
+    np.save(f'data_pretrained/{dataset}/y_train', y_train)
+    np.save(f'data_pretrained/{dataset}/y_test', y_test)
+
+    x_train = np.load(f'data_pretrained/{dataset}/x_train.npy')
+    x_test = np.load(f'data_pretrained/{dataset}/x_test.npy')
+    y_train = np.load(f'data_pretrained/{dataset}/y_train.npy')
+    y_test = np.load(f'data_pretrained/{dataset}/y_test.npy')
+    print(x_test.shape, y_test.shape)
+    print(x_train.shape, y_train.shape)
+
+    train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train))
+    test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test))
+    test_ds = test_ds.batch(batch_size)
+    train_ds = train_ds.batch(batch_size)
+
+    # create linear model and fit
+    linear_model = tf.keras.models.Sequential(tf.keras.layers.Dense(units=100))
+    linear_model.compile(optimizer=tf.keras.optimizers.Adam(lr),
+                         loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                         metrics=['accuracy'])
+
+    linear_model.fit(
+        train_ds,
+        epochs=epochs,
+        validation_data=test_ds,
+    )
