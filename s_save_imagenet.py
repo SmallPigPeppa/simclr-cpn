@@ -139,19 +139,20 @@ if __name__ == '__main__':
     train_dataset = train_dataset.batch(batch_size)
     train_dataset = train_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     train_dataset = train_dataset.batch(batch_size)
-    train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-
-    test_dataset = test_dataset.batch(batch_size)
-    test_dataset = test_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    test_dataset = test_dataset.batch(batch_size)
-    test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-
-    x_train = np.empty((0, 2048))
-    y_train = np.empty((0))
-    progbar_train = tf.keras.utils.Progbar(200000/batch_size)
-    for idx,(imgs, labels) in enumerate(train_dataset):
-        print(imgs)
-        break
+    print(train_dataset[0])
+    # train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    #
+    # test_dataset = test_dataset.batch(batch_size)
+    # test_dataset = test_dataset.map(map_func, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    # test_dataset = test_dataset.batch(batch_size)
+    # test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    #
+    # x_train = np.empty((0, 2048))
+    # y_train = np.empty((0))
+    # progbar_train = tf.keras.utils.Progbar(200000/batch_size)
+    # for idx,(imgs, labels) in enumerate(train_dataset):
+    #     print(imgs)
+    #     break
     #     x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
     #     x_train = np.append(x_train, x_i, axis=0)
     #     # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
