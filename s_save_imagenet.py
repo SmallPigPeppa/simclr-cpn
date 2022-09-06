@@ -156,6 +156,7 @@ if __name__ == '__main__':
         y_test = np.append(y_test, labels.numpy(), axis=0)
     print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
 
+    os.makedirs(f'data_pretrained/{dataset}/',exist_ok=True)
     np.save(f'data_pretrained/{dataset}/x_train', x_train)
     np.save(f'data_pretrained/{dataset}/x_test', x_test)
     np.save(f'data_pretrained/{dataset}/y_train', y_train)
