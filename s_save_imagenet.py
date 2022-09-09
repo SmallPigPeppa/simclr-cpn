@@ -40,53 +40,53 @@ if __name__ == '__main__':
     image_size = 224
     lr = 0.0001
     epochs = 100
-    # pretrained_model = tf.saved_model.load(ckpt_path)
-    # train_dataset = tf.keras.utils.image_dataset_from_directory(
-    #     directory=os.path.join(data_path, "train"),
-    #     batch_size=batch_size,
-    #     image_size=(256, 256),
-    # )
-    # test_dataset = tf.keras.utils.image_dataset_from_directory(
-    #     directory=os.path.join(data_path, "val"),
-    #     batch_size=batch_size,
-    #     image_size=(256, 256),
-    # )
-    # train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    # test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
-    #
-    # transforms = tf.keras.layers.CenterCrop(
-    #     height=IMG_SIZE, width=IMG_SIZE
-    # )
-    # train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
-    # test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
-    # train_dataset = train_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x, dtype=tf.float32), y))
-    # test_dataset = test_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x, dtype=tf.float32), y))
-    # train_dataset = train_dataset.map(lambda x, y: (x / 255., y))
-    # test_dataset = test_dataset.map(lambda x, y: (x / 255., y))
-    #
-    # x_train = np.empty((0, 2048))
-    # y_train = np.empty((0))
-    # for (imgs, labels) in tqdm(train_dataset):
-    #     x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
-    #     x_train = np.append(x_train, x_i, axis=0)
-    #     # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
-    #     y_train = np.append(y_train, labels.numpy(), axis=0)
-    # print("x_train.shape:", x_train.shape, "\ny_train.shape:", y_train.shape)
-    #
-    # x_test = np.empty((0, 2048))
-    # y_test = np.empty((0))
-    # for (imgs, labels) in tqdm(test_dataset):
-    #     x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
-    #     x_test = np.append(x_test, x_i, axis=0)
-    #     # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
-    #     y_test = np.append(y_test, labels.numpy(), axis=0)
-    # print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
-    #
-    # os.makedirs(f'data_pretrained/{dataset}/', exist_ok=True)
-    # np.save(f'data_pretrained/{dataset}/x_train', x_train)
-    # np.save(f'data_pretrained/{dataset}/x_test', x_test)
-    # np.save(f'data_pretrained/{dataset}/y_train', y_train)
-    # np.save(f'data_pretrained/{dataset}/y_test', y_test)
+    pretrained_model = tf.saved_model.load(ckpt_path)
+    train_dataset = tf.keras.utils.image_dataset_from_directory(
+        directory=os.path.join(data_path, "train"),
+        batch_size=batch_size,
+        image_size=(256, 256),
+    )
+    test_dataset = tf.keras.utils.image_dataset_from_directory(
+        directory=os.path.join(data_path, "val"),
+        batch_size=batch_size,
+        image_size=(256, 256),
+    )
+    train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+    test_dataset = test_dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+    transforms = tf.keras.layers.CenterCrop(
+        height=IMG_SIZE, width=IMG_SIZE
+    )
+    train_dataset = train_dataset.map(lambda x, y: (transforms(x), y))
+    test_dataset = test_dataset.map(lambda x, y: (transforms(x), y))
+    train_dataset = train_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x, dtype=tf.float32), y))
+    test_dataset = test_dataset.map(lambda x, y: (tf.image.convert_image_dtype(x, dtype=tf.float32), y))
+    train_dataset = train_dataset.map(lambda x, y: (x / 255., y))
+    test_dataset = test_dataset.map(lambda x, y: (x / 255., y))
+
+    x_train = np.empty((0, 2048))
+    y_train = np.empty((0))
+    for (imgs, labels) in tqdm(train_dataset):
+        x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
+        x_train = np.append(x_train, x_i, axis=0)
+        # y_train = np.append(y_train, vmapfunc(labels.numpy()), axis=0)
+        y_train = np.append(y_train, labels.numpy(), axis=0)
+    print("x_train.shape:", x_train.shape, "\ny_train.shape:", y_train.shape)
+
+    x_test = np.empty((0, 2048))
+    y_test = np.empty((0))
+    for (imgs, labels) in tqdm(test_dataset):
+        x_i = pretrained_model(imgs, trainable=False)['final_avg_pool'].numpy()
+        x_test = np.append(x_test, x_i, axis=0)
+        # y_test = np.append(y_test, vmapfunc(labels.numpy()), axis=0)
+        y_test = np.append(y_test, labels.numpy(), axis=0)
+    print("x_test.shape:", x_test.shape, "\ny_test.shape:", y_test.shape)
+
+    os.makedirs(f'data_pretrained/{dataset}/', exist_ok=True)
+    np.save(f'data_pretrained/{dataset}/x_train', x_train)
+    np.save(f'data_pretrained/{dataset}/x_test', x_test)
+    np.save(f'data_pretrained/{dataset}/y_train', y_train)
+    np.save(f'data_pretrained/{dataset}/y_test', y_test)
 
     x_train = np.load(f'data_pretrained/{dataset}/x_train.npy')
     x_test = np.load(f'data_pretrained/{dataset}/x_test.npy')
@@ -112,3 +112,17 @@ if __name__ == '__main__':
         epochs=epochs,
         validation_data=test_ds,
     )
+
+# /home/wzliu/code/byol-deepmind
+# python -m byol.main_loop \
+#   --experiment_mode= 'linear-eval' \
+#   --worker_mode='eval' \
+#   --checkpoint_root='/home/wzliu/code/byol-deepmind/ckpt' \
+#   --pretrain_epochs=1000
+#
+#
+# python -m byol.main_loop \
+#   --experiment_mode='linear-eval' \
+#   --worker_mode='eval' \
+#   --checkpoint_root='/home/wzliu/code/byol-deepmind/ckpt' \
+#   --pretrain_epochs= 1000
